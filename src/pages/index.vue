@@ -13,7 +13,7 @@
     <div class="grid grid-cols-7 grid-flow-row">
       <template
         v-for="weekday in weekdayConstants"
-        :key="weekday.isoWeekday"
+        :key="weekday.weekday"
       >
         <div class="flex flex-col justify-items-center">
           <span class="text-gray-700 text-center">{{ weekday.print }}</span>
@@ -47,41 +47,18 @@
 </template>
 
 <script setup lang="ts">
-import moment from 'moment'
+import * as Moment from 'moment'
+import { extendMoment } from 'moment-range'
+
+const moment = extendMoment(Moment)
 
 const startDate = ref<Date>()
 const endDate = ref<Date>()
 
-const weekdayConstants = [
-  {
-    isoWeekday: 7,
-    print: 'SUN',
-  },
-  {
-    isoWeekday: 1,
-    print: 'MON',
-  },
-  {
-    isoWeekday: 2,
-    print: 'TUE',
-  },
-  {
-    isoWeekday: 3,
-    print: 'WED',
-  },
-  {
-    isoWeekday: 4,
-    print: 'THU',
-  },
-  {
-    isoWeekday: 5,
-    print: 'FRI',
-  },
-  {
-    isoWeekday: 6,
-    print: 'SAT',
-  },
-]
+const weekdayConstants = moment.weekdaysShort(true).map((weekdayText, index) => ({
+  weekday: index,
+  print: weekdayText,
+}))
 
 const startMoment = computed(() => moment(startDate.value).startOf('day'))
 const endMoment = computed(() => moment(endDate.value).add(1).startOf('day'))
@@ -90,18 +67,19 @@ const dateArrayByWeekday = computed(() => {
   const dates: any[] = []
 
   const iteratorDate = moment(startDate.value).startOf('week')
-  const finalDate = moment(endDate.value).add(1, 'day').endOf('week')
+  const finalDate = moment(endDate.value).endOf('week')
 
-  while (!iteratorDate.isSameOrAfter(finalDate)) {
+  const range = moment.range(iteratorDate, finalDate)
+
+  for (const day of range.by('day')) {
     dates.push({
-      day: iteratorDate.day(),
-      month: iteratorDate.month(),
-      year: iteratorDate.year(),
-      isoWeekday: iteratorDate.isoWeekday(),
-      printDate: iteratorDate.format('dddd, MMM D YYYY'),
-      display: iteratorDate.isBetween(startMoment.value, endMoment.value, 'day', '[]'),
+      day: day.day(),
+      month: day.month(),
+      year: day.year(),
+      weekday: day.weekday(),
+      printDate: day.format('ddd, MMM D YYYY'),
+      display: day.isBetween(startMoment.value, endMoment.value, 'day', '[]'),
     })
-    iteratorDate.add(1, 'day')
   }
 
   return dates
