@@ -30,11 +30,14 @@
             <span>{{ day.printDate }}</span>
           </div>
           <div class="flex flex-col my-2">
-            <div class="bg-orange-500 py-2 pl-2 my-1 min-w-[200px]">
-              TEST
+            <div class="bg-orange-500 py-2 pl-2 my-1">
+              Warning
             </div>
             <div class="bg-red-500 py-2 pl-2 my-1">
-              TEST2
+              Error
+            </div>
+            <div class="bg-green-500 py-2 pl-2 my-1">
+              Hey all ok 😁
             </div>
           </div>
         </div>
